@@ -43,8 +43,8 @@ public class Client {
 		int count = 0;
 		
 		while (true) {
+			selector.select();
 			selectionKeys = selector.selectedKeys();
-			System.out.println(selectionKeys);
 			iterator = selectionKeys.iterator();
 			while (iterator.hasNext()) {
 				selectionKey = iterator.next();
@@ -61,7 +61,8 @@ public class Client {
 						client.write(sendBuffer);
 					}
 					client.register(selector, SelectionKey.OP_READ);
-				} else if (selectionKey.isReadable()) {
+				}
+				if (selectionKey.isReadable()) {
 					client = (SocketChannel) selectionKey.channel();
 					receiveBuffer.clear();
 					count = client.read(receiveBuffer);
@@ -70,7 +71,8 @@ public class Client {
 						System.out.println("客户端接受服务端数据："+receiveText);
 						client.register(selector, SelectionKey.OP_WRITE);
 					}
-				} else if (selectionKey.isWritable()) {
+				}
+				if (selectionKey.isWritable()) {
 					sendBuffer.clear();
 					client = (SocketChannel) selectionKey.channel();
 					sendText = "Msg send to Server -> "+flag++;

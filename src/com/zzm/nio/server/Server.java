@@ -21,9 +21,9 @@ public class Server {
 	
 	private final int BLOCK_SIZE = 4096;//缓冲区大小
 	
-	private ByteBuffer sendBuffer = ByteBuffer.allocate(BLOCK_SIZE);//发送缓冲区
+	private ByteBuffer sendBuffer = ByteBuffer.allocate(BLOCK_SIZE);//发送数据缓冲区
 	
-	private ByteBuffer receiveBuffer = ByteBuffer.allocate(BLOCK_SIZE);//接受缓冲区
+	private ByteBuffer receiveBuffer = ByteBuffer.allocate(BLOCK_SIZE);//接收数据缓冲区
 	
 	private Selector selector;//选择器
 	
@@ -35,14 +35,13 @@ public class Server {
 	 * @Return IOException 
 	 */
 	public Server(int port) throws IOException {
-		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();//服务端channel开启
+		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();//服务端通道开启
 		serverSocketChannel.configureBlocking(false);//设置为非堵塞状态
-		ServerSocket serverSocket = serverSocketChannel.socket();//服务端获取socket
+		ServerSocket serverSocket = serverSocketChannel.socket();//获取服务端socket
 		serverSocket.bind(new InetSocketAddress(port));//设置socket端口
 		selector = Selector.open();//打开选择器
 		serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);//将监听注册至选择器 *现在开始已经监听端口了
 		System.out.println("Server start listen "+port);
-		System.out.println(selector.selectedKeys());
 	}
 	
 	public static void main(String[] args) {
@@ -62,14 +61,14 @@ public class Server {
 	 * @Throws IOEception
 	 */
 	public void listen() throws IOException {
-		while(true) {
+		while (true) {
 			selector.select();//获取事件列表
 			Set<SelectionKey> selectionKeys = selector.selectedKeys();//获取selectkey的集合
 			Iterator<SelectionKey> iterator = selectionKeys.iterator();//set集合的迭代
 			while (iterator.hasNext()) {//遍历SelectionKey
 				SelectionKey selectionKey = iterator.next();
-				iterator.remove();
-				this.handleKey(selectionKey);
+				iterator.remove();//删除该事件并处理该事件
+				this.handleKey(selectionKey);//业务逻辑
 			}
 		}
 	}
@@ -109,3 +108,4 @@ public class Server {
 		}
 	}
 }
+  
